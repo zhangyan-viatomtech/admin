@@ -1,13 +1,16 @@
 import { login, logout, getInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import Cookies from "js-cookie";
+import store from '@/store'
 
 const user = {
   state: {
     token: getToken(),
     name: '',
     avatar: '',
-    roles: [],
-    permissions: []
+    roles: '',
+    permissions: [],
+    info:''
   },
 
   mutations: {
@@ -25,7 +28,7 @@ const user = {
     },
     SET_PERMISSIONS: (state, permissions) => {
       state.permissions = permissions
-    }
+    },
   },
 
   actions: {
@@ -37,8 +40,12 @@ const user = {
       const uuid = userInfo.uuid
       return new Promise((resolve, reject) => {
         login(username, password, code, uuid).then(res => {
-          setToken(res.token)
-          commit('SET_TOKEN', res.token)
+          setToken(res.data.token)
+          commit('SET_TOKEN', res.data.token)
+          // store.state.user.info = res.data.manager
+          // store.state.user.info.roles = 0
+          console.log(store.state.manager)
+          Cookies.set('RolesId', res.data.manager.id)
           resolve()
         }).catch(error => {
           reject(error)
@@ -49,7 +56,7 @@ const user = {
     // 获取用户信息
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        getInfo(state.token).then(res => {
+        getInfo().then(res => {
           const user = res.user
           const avatar = user.avatar == "" ? require("@/assets/images/profile.jpg") : process.env.VUE_APP_BASE_API + user.avatar;
           if (res.roles && res.roles.length > 0) { // 验证返回的roles是否是一个非空数组
@@ -66,7 +73,7 @@ const user = {
         })
       })
     },
-    
+
     // 退出系统
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {

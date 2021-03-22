@@ -1,11 +1,17 @@
 import request from '@/utils/request'
+import Cookies from "js-cookie";
 
 // 查询菜单列表
 export function listMenu(query) {
   return request({
-    url: '/system/menu/list',
+    url: '/healthRole/getAllOperation',
+    header:{
+      'Content-Type':'application/x-www-form-urlencoded'
+    },
     method: 'get',
-    params: query
+    params:{
+      roleId:Cookies.get("RolesId")
+    }
   })
 }
 
@@ -45,8 +51,11 @@ export function addMenu(data) {
 // 修改菜单
 export function updateMenu(data) {
   return request({
-    url: '/system/menu',
-    method: 'put',
+    url: '/healthRole/updateRole',
+    header:{
+      'Content-Type':'application/x-www-form-urlencoded'
+    },
+    method: 'post',
     data: data
   })
 }

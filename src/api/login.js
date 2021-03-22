@@ -1,17 +1,18 @@
 import request from '@/utils/request'
 
 // 登录方法
-export function login(username, password, code, uuid) {
+export function login(phone, password, code, uuid) {
   const data = {
-    username,
+    phone,
     password,
-    code,
-    uuid
   }
   return request({
     url: '/login',
+    header:{
+      'Content-Type':'application/x-www-form-urlencoded'
+    },
     method: 'post',
-    data: data
+    params: data
   })
 }
 
@@ -28,6 +29,29 @@ export function logout() {
   return request({
     url: '/logout',
     method: 'post'
+  })
+}
+//检测手机号码是否已经注册
+export function checkPhoneExist(phone) {
+  return request({
+    url: '/checkPhoneExist',
+    header:{
+      'Content-Type':'application/x-www-form-urlencoded'
+    },
+    method: 'post',
+    params: {phone}
+  })
+}
+
+//注册
+export function register(phone) {
+  return request({
+    url: '/register',
+    header:{
+      'Content-Type':'application/x-www-form-urlencoded'
+    },
+    method: 'post',
+    params: {phone}
   })
 }
 

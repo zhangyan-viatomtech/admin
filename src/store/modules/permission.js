@@ -2,12 +2,14 @@ import { constantRoutes } from '@/router'
 import { getRouters } from '@/api/menu'
 import Layout from '@/layout/index'
 import ParentView from '@/components/ParentView';
+import {dataToFlatten,transfer} from "@/utils/treeConversion"
+import store from '@/store'
 
 const permission = {
   state: {
     routes: [],
     addRoutes: [],
-    sidebarRouters: []
+    sidebarRouters: [],
   },
   mutations: {
     SET_ROUTES: (state, routes) => {
@@ -24,8 +26,12 @@ const permission = {
       return new Promise(resolve => {
         // 向后端请求路由数据
         getRouters().then(res => {
-          const sdata = JSON.parse(JSON.stringify(res.data))
-          const rdata = JSON.parse(JSON.stringify(res.data))
+          let resData = JSON.parse(JSON.stringify(res.data))
+          let arr = dataToFlatten(resData)
+          let data = transfer(arr)
+          store.state.menu.accessRoutes=data
+          const sdata = data
+          const rdata = data
           const sidebarRoutes = filterAsyncRouter(sdata)
           const rewriteRoutes = filterAsyncRouter(rdata, false, true)
           rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true })
@@ -54,6 +60,7 @@ function filterAsyncRouter(asyncRouterMap, lastRouter = false, type = false) {
         route.component = loadView(route.component)
       }
     }
+
     if (route.children != null && route.children && route.children.length) {
       route.children = filterAsyncRouter(route.children, route, type)
     } else {

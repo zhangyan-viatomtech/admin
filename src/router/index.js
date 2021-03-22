@@ -118,6 +118,31 @@ export const constantRoutes = [
         meta: { title: '修改生成配置' }
       }
     ]
+  },
+  {
+    path: '/system',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/system/user',
+        component: (resolve) => require(['@/views/system/user'], resolve),
+        name: 'User',
+        meta: { title: '用户管理' }
+      },
+      {
+        path: '/system/role',
+        component: (resolve) => require(['@/views/system/role'], resolve),
+        name: 'Role',
+        meta: { title: '角色管理' }
+      },
+      {
+        path: '/system/menu',
+        component: (resolve) => require(['@/views/system/menu'], resolve),
+        name: 'Menu',
+        meta: { title: '菜单管理' }
+      }
+    ]
   }
 ]
 

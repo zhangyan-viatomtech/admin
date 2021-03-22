@@ -1,11 +1,12 @@
 import request from '@/utils/request'
+import axios from '_axios@0.21.0@axios'
 
 // 查询角色列表
 export function listRole(query) {
   return request({
-    url: '/system/role/list',
+    url: '/healthRole/getAllRole',
     method: 'get',
-    params: query
+    data: query
   })
 }
 
@@ -20,7 +21,7 @@ export function getRole(roleId) {
 // 新增角色
 export function addRole(data) {
   return request({
-    url: '/system/role',
+    url: '/healthRole/addRole',
     method: 'post',
     data: data
   })
@@ -28,11 +29,15 @@ export function addRole(data) {
 
 // 修改角色
 export function updateRole(data) {
-  return request({
-    url: '/system/role',
-    method: 'put',
+
+  /*return request({
+    url: '/healthRole/changeRoleOperation',
+    header:{
+      'Content-Type':'application/json'
+    },
+    method: 'post',
     data: data
-  })
+  })*/
 }
 
 // 角色数据权限
@@ -60,8 +65,11 @@ export function changeRoleStatus(roleId, status) {
 // 删除角色
 export function delRole(roleId) {
   return request({
-    url: '/system/role/' + roleId,
-    method: 'delete'
+    url: '/healthRole/deleteRole',
+    method: 'delete',
+    data:{
+      roleId
+    }
   })
 }
 

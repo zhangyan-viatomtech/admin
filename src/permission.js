@@ -4,6 +4,7 @@ import { Message } from 'element-ui'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import { getToken } from '@/utils/auth'
+import Cookies from "js-cookie";
 
 NProgress.configure({ showSpinner: false })
 
@@ -17,12 +18,20 @@ router.beforeEach((to, from, next) => {
       next({ path: '/' })
       NProgress.done()
     } else {
-      if (store.getters.roles.length === 0) {
+      if (store.state.user.roles.length==0) {
+        store.dispatch('GenerateRoutes').then(accessRoutes => {
+          console.log('accessRoutes',accessRoutes)
+          store.state.user.roles = Cookies.get('RolesId')
+          // 根据roles权限生成可访问的路由表
+          // router.addRoutes(accessRoutes) // 动态添加可访问路由表
+          next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
+        }).catch(err=>{
+          console.log('err2',err)
+        })
         // 判断当前用户是否已拉取完user_info信息
-        store.dispatch('GetInfo').then(res => {
-          // 拉取user_info
-          const roles = res.roles
-          store.dispatch('GenerateRoutes', { roles }).then(accessRoutes => {
+        /*store.dispatch('GetInfo').then(() => {
+          store.dispatch('GenerateRoutes').then(accessRoutes => {
+            console.log(accessRoutes)
             // 根据roles权限生成可访问的路由表
             router.addRoutes(accessRoutes) // 动态添加可访问路由表
             next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
@@ -32,7 +41,7 @@ router.beforeEach((to, from, next) => {
               Message.error(err)
               next({ path: '/' })
             })
-          })
+          })*/
       } else {
         next()
       }
