@@ -2,25 +2,28 @@
   <div v-if="!item.hidden">
     <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow">
       <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
-        <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}">
-          <item :icon="onlyOneChild.meta.icon||(item.meta&&item.meta.icon)" :title="onlyOneChild.name" />
+        <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{'submenu-title-noDropdown':!isNest}" v-if="item.enabled==1">
+          <item v-if="item.pid" :title="onlyOneChild.name" />
+          <item v-else :icon="onlyOneChild.meta.icon||(item.meta&&item.meta.icon)" :title="onlyOneChild.name" />
         </el-menu-item>
       </app-link>
     </template>
 
-    <el-submenu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
-      <template slot="title">
-        <item v-if="item.meta" :icon="item.meta && item.meta.icon" :title="item.meta.title" />
-      </template>
-      <sidebar-item
-        v-for="child in item.children"
-        :key="child.path"
-        :is-nest="true"
-        :item="child"
-        :base-path="resolvePath(child.path)"
-        class="nest-menu"
-      />
-    </el-submenu>
+    <div v-else>
+      <el-submenu v-if="item.enabled==1"  ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
+        <template slot="title">
+          <item v-if="item.meta" :icon="item.meta && item.meta.icon" :title="item.menuName" />
+        </template>
+        <sidebar-item
+          v-for="(child,index) in item.children"
+          :key="child.path + index"
+          :is-nest="true"
+          :item="child"
+          :base-path="resolvePath(child.path)"
+          class="nest-menu"
+        />
+      </el-submenu>
+    </div>
   </div>
 </template>
 
@@ -50,6 +53,9 @@ export default {
       default: ''
     }
   },
+  mounted() {
+
+  },
   data() {
     this.onlyOneChild = null
     return {}
@@ -68,7 +74,6 @@ export default {
           return true
         }
       })
-
       // When there is only one child router, the child router is displayed by default
       if (showingChildren.length === 1) {
         return true
@@ -86,6 +91,7 @@ export default {
       if (isExternal(routePath)) {
         return routePath
       }
+      // console.log(this.basePath)
       if (isExternal(this.basePath)) {
         return this.basePath
       }

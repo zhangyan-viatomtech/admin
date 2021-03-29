@@ -23,21 +23,26 @@ export function addRole(data) {
   return request({
     url: '/healthRole/addRole',
     method: 'post',
-    data: data
+    params: data
   })
 }
 
 // 修改角色
 export function updateRole(data) {
-
-  /*return request({
-    url: '/healthRole/changeRoleOperation',
-    header:{
-      'Content-Type':'application/json'
-    },
+  return request({
+    url: '/healthRole/updateRole',
     method: 'post',
+    params: data
+  })
+}
+// 修改菜单权限
+export function changeRoleOperation(data,type) {
+  return request({
+    url: '/healthRole/changeRoleOperation',
+    method: 'post',
+    type:type,
     data: data
-  })*/
+  })
 }
 
 // 角色数据权限
@@ -66,8 +71,8 @@ export function changeRoleStatus(roleId, status) {
 export function delRole(roleId) {
   return request({
     url: '/healthRole/deleteRole',
-    method: 'delete',
-    data:{
+    method: 'post',
+    params:{
       roleId
     }
   })

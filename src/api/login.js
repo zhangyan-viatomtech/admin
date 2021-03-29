@@ -8,9 +8,7 @@ export function login(phone, password, code, uuid) {
   }
   return request({
     url: '/login',
-    header:{
-      'Content-Type':'application/x-www-form-urlencoded'
-    },
+
     method: 'post',
     params: data
   })
@@ -35,9 +33,7 @@ export function logout() {
 export function checkPhoneExist(phone) {
   return request({
     url: '/checkPhoneExist',
-    header:{
-      'Content-Type':'application/x-www-form-urlencoded'
-    },
+
     method: 'post',
     params: {phone}
   })
@@ -47,9 +43,7 @@ export function checkPhoneExist(phone) {
 export function register(phone) {
   return request({
     url: '/register',
-    header:{
-      'Content-Type':'application/x-www-form-urlencoded'
-    },
+
     method: 'post',
     params: {phone}
   })

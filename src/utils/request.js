@@ -4,7 +4,6 @@ import store from '@/store'
 import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 
-axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded'
 let baseURL = 'http://34.211.35.76:8099'
 // 创建axios实例
 const service = axios.create({
@@ -15,6 +14,11 @@ const service = axios.create({
 })
 // request拦截器
 service.interceptors.request.use(config => {
+  if (config.type == 'change') {
+    config.headers['Content-Type'] = 'application/json'
+  } else {
+    config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+  }
   // 是否需要设置 token
   const isToken = (config.headers || {}).isToken === false
   if (getToken() && !isToken) {

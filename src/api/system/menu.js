@@ -2,16 +2,11 @@ import request from '@/utils/request'
 import Cookies from "js-cookie";
 
 // 查询菜单列表
-export function listMenu(query) {
+export function listMenu(data) {
   return request({
-    url: '/healthRole/getAllOperation',
-    header:{
-      'Content-Type':'application/x-www-form-urlencoded'
-    },
+    url: '/menu/selectMenu',
     method: 'get',
-    params:{
-      roleId:Cookies.get("RolesId")
-    }
+    params:data
   })
 }
 
@@ -40,30 +35,31 @@ export function roleMenuTreeselect(roleId) {
 }
 
 // 新增菜单
-export function addMenu(data) {
+export function addMenu(data,type) {
   return request({
-    url: '/system/menu',
+    url: '/menu/addMenu',
     method: 'post',
+    type,
     data: data
   })
 }
 
 // 修改菜单
-export function updateMenu(data) {
+export function updateMenu(data,type) {
   return request({
-    url: '/healthRole/updateRole',
-    header:{
-      'Content-Type':'application/x-www-form-urlencoded'
-    },
+    url: '/menu/updateMenu',
     method: 'post',
+    type,
     data: data
   })
 }
 
 // 删除菜单
-export function delMenu(menuId) {
+export function delMenu(data,type) {
   return request({
-    url: '/system/menu/' + menuId,
-    method: 'delete'
+    url: '/menu/deleteMenu',
+    method: 'post',
+    type,
+    params:data
   })
 }

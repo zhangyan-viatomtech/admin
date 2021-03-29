@@ -9,7 +9,7 @@
                 :text-color="settings.sideTheme === 'theme-dark' ? variables.menuText : 'rgba(0,0,0,.65)'"
                 :unique-opened="true"
                 :active-text-color="settings.theme"
-                :collapse-transition="false"
+                :collapse-transition="true"
                 mode="vertical"
             >
                 <sidebar-item
@@ -28,6 +28,8 @@ import { mapGetters, mapState } from "vuex";
 import Logo from "./Logo";
 import SidebarItem from "./SidebarItem";
 import variables from "@/assets/styles/variables.scss";
+import { getRouters } from '@/api/menu'
+import { dataToFlatten, transfer } from '@/utils/treeConversion'
 
 export default {
     components: { SidebarItem, Logo },
@@ -50,8 +52,22 @@ export default {
             return variables;
         },
         isCollapse() {
-            return !this.sidebar.opened;
+          return !this.sidebar.opened;
         }
+    },
+  watch:{
+    sidebarRouters(data){
+      console.log(data)
     }
+  },
+  mounted(){
+    let that = this
+    getRouters().then(res => {
+      let resData = JSON.parse(JSON.stringify(res.data))
+      let arr = dataToFlatten(resData)
+      let data = transfer(arr)
+      that.$store.state.permission.sidebarRouters=data
+    })
+  }
 };
 </script>

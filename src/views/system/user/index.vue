@@ -115,26 +115,6 @@
               v-hasPermi="['system:user:remove']"
             >删除</el-button>
           </el-col>
-          <el-col :span="1.5">
-            <el-button
-              type="info"
-              plain
-              icon="el-icon-upload2"
-              size="mini"
-              @click="handleImport"
-              v-hasPermi="['system:user:import']"
-            >导入</el-button>
-          </el-col>
-          <el-col :span="1.5">
-            <el-button
-              type="warning"
-              plain
-              icon="el-icon-download"
-              size="mini"
-              @click="handleExport"
-              v-hasPermi="['system:user:export']"
-            >导出</el-button>
-          </el-col>
           <right-toolbar :showSearch.sync="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
         </el-row>
 
@@ -348,6 +328,8 @@ import { getToken } from "@/utils/auth";
 import { treeselect } from "@/api/system/dept";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+import { getRouters } from '@/api/menu'
+import { dataToFlatten, transfer } from '@/utils/treeConversion'
 
 export default {
   name: "User",
@@ -463,7 +445,7 @@ export default {
     }
   },
   created() {
-    this.getList();
+    /*this.getList();
     this.getTreeselect();
     this.getDicts("sys_normal_disable").then(response => {
       this.statusOptions = response.data;
@@ -473,9 +455,22 @@ export default {
     });
     this.getConfigKey("sys.user.initPassword").then(response => {
       this.initPassword = response.msg;
-    });
+    });*/
+    this.getmenu()
   },
   methods: {
+    getmenu(){
+      /*if(this.form.roleId){
+        Cookies.set("RolesId",this.form.roleId)
+      }*/
+      let that = this
+      getRouters().then(res => {
+        let resData = JSON.parse(JSON.stringify(res.data))
+        let arr = dataToFlatten(resData)
+        let data = transfer(arr)
+        that.$store.state.permission.sidebarRouters=data
+      })
+    },
     /** 查询用户列表 */
     getList() {
       this.loading = true;

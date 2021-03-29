@@ -11,6 +11,7 @@ const state = {
 
 const mutations = {
   TOGGLE_SIDEBAR: state => {
+    console.log(state.sidebar)
     state.sidebar.opened = !state.sidebar.opened
     state.sidebar.withoutAnimation = false
     if (state.sidebar.opened) {
@@ -20,6 +21,7 @@ const mutations = {
     }
   },
   CLOSE_SIDEBAR: (state, withoutAnimation) => {
+    console.log(state.sidebar)
     Cookies.set('sidebarStatus', 0)
     state.sidebar.opened = false
     state.sidebar.withoutAnimation = withoutAnimation
@@ -35,9 +37,11 @@ const mutations = {
 
 const actions = {
   toggleSideBar({ commit }) {
+    console.log('TOGGLE_SIDEBAR')
     commit('TOGGLE_SIDEBAR')
   },
   closeSideBar({ commit }, { withoutAnimation }) {
+    console.log('CLOSE_SIDEBAR',withoutAnimation)
     commit('CLOSE_SIDEBAR', withoutAnimation)
   },
   toggleDevice({ commit }, device) {

@@ -28,13 +28,13 @@ import ParentView from '@/components/ParentView';
 // 公共路由
 export const constantRoutes = [
   {
-    path: '/redirect',
+    path: '',
     component: Layout,
     hidden: true,
     children: [
       {
         path: '/redirect/:path(.*)',
-        component: (resolve) => require(['@/views/redirect'], resolve)
+        component: (resolve) => require(['@/views/system/user'], resolve)
       }
     ]
   },
@@ -54,69 +54,22 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    path: '',
-    component: Layout,
-    redirect: 'index',
-    children: [
-      {
-        path: 'index',
-        component: (resolve) => require(['@/views/index'], resolve),
-        name: '首页',
-        meta: { title: '首页', icon: 'dashboard', noCache: true, affix: true }
-      }
-    ]
-  },
-  {
     path: '/user',
     component: Layout,
     hidden: true,
-    redirect: 'noredirect',
     children: [
       {
-        path: 'profile',
-        component: (resolve) => require(['@/views/system/user/profile/index'], resolve),
-        name: 'Profile',
-        meta: { title: '个人中心', icon: 'user' }
-      }
-    ]
-  },
-  {
-    path: '/dict',
-    component: Layout,
-    hidden: true,
-    children: [
+        path: '/system/user/index',
+        component: (resolve) => require(['@/views/system/user'], resolve),
+        name: 'User',
+        meta: { title: '用户管理' }
+      },
       {
-        path: 'type/data/:dictId(\\d+)',
-        component: (resolve) => require(['@/views/system/dict/data'], resolve),
-        name: 'Data',
-        meta: { title: '字典数据', icon: '' }
-      }
-    ]
-  },
-  {
-    path: '/job',
-    component: Layout,
-    hidden: true,
-    children: [
-      {
-        path: 'log',
-        component: (resolve) => require(['@/views/monitor/job/log'], resolve),
-        name: 'JobLog',
-        meta: { title: '调度日志' }
-      }
-    ]
-  },
-  {
-    path: '/gen',
-    component: Layout,
-    hidden: true,
-    children: [
-      {
-        path: 'edit/:tableId(\\d+)',
-        component: (resolve) => require(['@/views/tool/gen/editTable'], resolve),
-        name: 'GenEdit',
-        meta: { title: '修改生成配置' }
-      }
+        path: '/system/user/list',
+        component: (resolve) => require(['@/views/system/user/ECGAnalysis'], resolve),
+        name: 'ECGAnalysislist',
+        meta: { title: '心电分析服务列表' }
+      },
     ]
   },
   {
@@ -125,13 +78,26 @@ export const constantRoutes = [
     hidden: true,
     children: [
       {
-        path: '/system/user',
-        component: (resolve) => require(['@/views/system/user'], resolve),
-        name: 'User',
-        meta: { title: '用户管理' }
+        path: '/ecgmenu/type',
+        component: (resolve) => require(['@/views/system/ECGmenu/ECGAnalysisType'], resolve),
+        name: 'ecgtype',
+        meta: { title: '心电分析卡类型' }
       },
       {
-        path: '/system/role',
+        path: '/ecgmenu/card',
+        component: (resolve) => require(['@/views/system/ECGmenu/ECGAnalysisCard'], resolve),
+        name: 'ecgcard',
+        meta: { title: '心电分析卡' }
+      },
+    ]
+  },
+  {
+    path: '/system',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/system/role/index',
         component: (resolve) => require(['@/views/system/role'], resolve),
         name: 'Role',
         meta: { title: '角色管理' }
@@ -141,7 +107,26 @@ export const constantRoutes = [
         component: (resolve) => require(['@/views/system/menu'], resolve),
         name: 'Menu',
         meta: { title: '菜单管理' }
+      },
+      {
+        path: '/system/userinfo/index',
+        component: (resolve) => require(['@/views/system/userinfo/index'], resolve),
+        name: 'userinfo',
+        meta: { title: '后台用户' }
       }
+    ]
+  },
+  {
+    path: '/system',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/system/password/index',
+        component: (resolve) => require(['@/views/system/password'], resolve),
+        name: 'password',
+        meta: { title: '修改密码' }
+      },
     ]
   }
 ]

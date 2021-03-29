@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
-      <h3 class="title">若依后台管理系统</h3>
+      <h3 class="title">海外健康管理平台</h3>
       <el-form-item prop="username">
         <el-input v-model="loginForm.username" @focus="focus_chang" @blur="blur_chang" type="text" auto-complete="off" placeholder="账号">
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
@@ -34,12 +34,12 @@
       <!--        </div>-->
       <!--      </el-form-item>-->
       <!--      <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>-->
-      <el-form-item>
+<!--      <el-form-item>
         <div class="topbtn">
           <span v-if="registerfalg" @click="register">立即注册</span>
           <span v-else  @click="login_chang">已有账号去登录</span>
         </div>
-      </el-form-item>
+      </el-form-item>-->
       <el-form-item style="width:100%;">
         <el-button
           :loading="loading"

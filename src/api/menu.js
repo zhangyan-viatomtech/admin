@@ -4,9 +4,6 @@ import Cookies from "js-cookie";
 export const getRouters = () => {
   return request({
     url: '/healthRole/getAllOperation',
-    header:{
-      'Content-Type':'application/x-www-form-urlencoded'
-    },
     method: 'get',
     params:{
       roleId:Cookies.get("RolesId")

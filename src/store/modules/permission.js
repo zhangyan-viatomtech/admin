@@ -17,7 +17,7 @@ const permission = {
       state.routes = constantRoutes.concat(routes)
     },
     SET_SIDEBAR_ROUTERS: (state, routers) => {
-      state.sidebarRouters = constantRoutes.concat(routers)
+      state.sidebarRouters = routers
     },
   },
   actions: {
@@ -29,7 +29,8 @@ const permission = {
           let resData = JSON.parse(JSON.stringify(res.data))
           let arr = dataToFlatten(resData)
           let data = transfer(arr)
-          store.state.menu.accessRoutes=data
+          store.state.permission.sidebarRouters=data
+          // store.state.menu.accessRoutes=data
           const sdata = data
           const rdata = data
           const sidebarRoutes = filterAsyncRouter(sdata)
