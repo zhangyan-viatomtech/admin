@@ -57,8 +57,7 @@ export default {
     },
     // 是否显示提示
     isShowTip: {
-      type: Boolean,
-      default: true
+      type: Boolean
     }
   },
   data() {
@@ -99,7 +98,7 @@ export default {
     // 上传前校检格式和大小
     handleBeforeUpload(file) {
       // 校检文件类型
-      if (this.fileType) {
+      if (this.fileType.length>0) {
         let fileExtension = "";
         if (file.name.lastIndexOf(".") > -1) {
           fileExtension = file.name.slice(file.name.lastIndexOf(".") + 1);
@@ -115,7 +114,7 @@ export default {
         }
       }
       // 校检文件大小
-      if (this.fileSize) {
+      if (this.fileSize>0) {
         const isLt = file.size / 1024 / 1024 < this.fileSize;
         if (!isLt) {
           this.$message.error(`上传文件大小不能超过 ${this.fileSize} MB!`);

@@ -2,9 +2,9 @@
   <div id="tags-view-container" class="tags-view-container">
     <scroll-pane ref="scrollPane" class="tags-view-wrapper" @scroll="handleScroll">
       <router-link
-        v-for="tag in visitedViews"
+        v-for="(tag,index) in visitedViews"
         ref="tag"
-        :key="tag.path"
+        :key="tag.path + index"
         :class="isActive(tag)?'active':''"
         :to="{ path: tag.path, query: tag.query, fullPath: tag.fullPath }"
         tag="span"

@@ -6,7 +6,7 @@ export const getRouters = () => {
     url: '/healthRole/getAllOperation',
     method: 'get',
     params:{
-      roleId:Cookies.get("RolesId")
+      roleIds:Cookies.get("RolesId")
     }
   })
 }

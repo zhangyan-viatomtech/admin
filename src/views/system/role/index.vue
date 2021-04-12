@@ -56,9 +56,16 @@
     </el-form>
     <el-row>
       <el-col :span="1.5">
-        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleAdd"
+        >新增</el-button>
       </el-col>
     </el-row>
+
     <el-table v-loading="loading" :data="roleList" @selection-change="handleSelectionChange">
       <el-table-column label="角色名称" prop="roleName" :show-overflow-tooltip="true" width="150" />
       <el-table-column label="说明" prop="explain" :show-overflow-tooltip="true" width="150" />
@@ -117,6 +124,7 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
 <!--    修改角色菜单权限-->
     <el-dialog :title="title" :visible.sync="open1" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">

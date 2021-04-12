@@ -44,8 +44,8 @@ const user = {
           commit('SET_TOKEN', res.data.token)
           // store.state.user.info = res.data.manager
           // store.state.user.info.roles = 0
-          console.log(store.state.manager)
-          Cookies.set('RolesId', res.data.manager.id)
+          Cookies.set('userId', res.data.id)
+          Cookies.set('RolesId', res.data.roleIds)
           resolve()
         }).catch(error => {
           reject(error)

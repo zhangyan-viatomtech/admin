@@ -2,19 +2,30 @@ import request from '@/utils/request'
 import { praseStrEmpty } from "@/utils/ruoyi";
 
 // 查询用户列表
-export function listUser(query) {
+export function listUser(query,type) {
   return request({
-    url: '/system/user/list',
-    method: 'get',
-    params: query
+    url: '/users/getUsers',
+    method: 'post',
+    data: query,
+    type
   })
 }
 
-// 查询用户详细
-export function getUser(userId) {
+export function password(data) {
   return request({
-    url: '/system/user/' + praseStrEmpty(userId),
-    method: 'get'
+    url: '/updatePassword',
+    method: 'post',
+    params: data
+  })
+}
+
+// 查询后台用户
+export function getUser(data,type) {//
+  return request({
+    url: '/healthManager/getManagers',
+    method: 'post',
+    data,
+    type
   })
 }
 

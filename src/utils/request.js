@@ -4,7 +4,24 @@ import store from '@/store'
 import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 
-let baseURL = 'http://34.209.148.123:8099'
+let baseURL = ''
+// let baseURL = 'http://212.129.241.54:8080/'
+function getQueryVariable(variable){
+  var query = window.location.search.substring(1);
+  var vars = query.split("&");
+  for (var i=0;i<vars.length;i++) {
+    var pair = vars[i].split("=");
+    if(pair[0] == variable){return pair[1];}
+  }
+  return(false);
+}
+if(getQueryVariable('env') == 'dev' || localStorage.getItem('env') == 'dev'){
+  baseURL = 'https://aitest.viatomtech.com/workstation'
+  localStorage.setItem('env','dev')
+}else if(getQueryVariable('env') == 'ai' || localStorage.getItem('env') == 'ai'){
+  baseURL = 'https://ai.viatomtech.com/workstation'
+  localStorage.setItem('env','ai')
+}
 // 创建axios实例
 const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分

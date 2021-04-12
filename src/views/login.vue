@@ -16,7 +16,8 @@
           @keyup.enter.native="handleLogin"
         >
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
-          <i slot="suffix" class="el-icon-view" :style="{'color':flag ? '#c0c4cc':'#409EFF'}" style="margin-top:8px;font-size:18px;" autocomplete="auto" @click="flag=!flag" />
+          <svg-icon slot="suffix" :icon-class="!flag?'eye-open':'eye'" class="el-input__icon input-icon" @click="flag=!flag"></svg-icon>
+<!--          <i slot="suffix" :class="flag?'el-icon-view':'eye'" style="margin-top:8px;font-size:18px;" autocomplete="auto" @click="flag=!flag" />-->
         </el-input>
       </el-form-item>
       <!--      <el-form-item prop="code">-->
@@ -78,8 +79,8 @@ export default {
       codeUrl: "",
       cookiePassword: "",
       loginForm: {
-        username: "7777777",
-        password: "123456",
+        username: "",
+        password: "",
         code: "",
         uuid: ""
       },

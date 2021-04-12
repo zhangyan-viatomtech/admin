@@ -1,25 +1,36 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
-      <el-form-item label="角色名称" prop="roleName">
+    <!--用户数据-->
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="名称" prop="appellation">
         <el-input
-          v-model="queryParams.roleName"
-          placeholder="请输入角色名称"
+          v-model="queryParams.appellation"
+          placeholder="请输入名称"
           clearable
           size="small"
           style="width: 240px"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="权限字符" prop="roleKey">
+      <el-form-item label="用户名" prop="name">
         <el-input
-          v-model="queryParams.roleKey"
-          placeholder="请输入权限字符"
+          v-model="queryParams.name"
+          placeholder="请输入用户名"
           clearable
           size="small"
           style="width: 240px"
           @keyup.enter.native="handleQuery"
         />
+      </el-form-item>
+      <el-form-item label="角色类型">
+        <el-select v-model="queryParams.roleId" placeholder="请选择角色类型" clearable size="small">
+          <el-option
+            v-for="dict in rolelist"
+            :key="dict.id"
+            :label="dict.roleName"
+            :value="dict.id"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -28,13 +39,21 @@
     </el-form>
     <el-row>
       <el-col :span="1.5">
-        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleAdd"
+        >新增</el-button>
       </el-col>
     </el-row>
-    <el-table v-loading="loading" :data="roleList">
-      <el-table-column label="角色名称" prop="roleName" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="说明" prop="explain" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+    <el-table v-loading="loading" :data="userList" @selection-change="handleSelectionChange">
+      <el-table-column label="名称" align="center" key="appellation" prop="appellation"/>
+      <el-table-column label="用户名" align="center" key="name" prop="name" />
+      <el-table-column label="角色" align="center" key="roles" prop="roles"/>
+      <el-table-column label="说明" align="center" key="explicate" prop="explicate" />
+      <el-table-column label="操作" align="center">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -55,19 +74,42 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="queryParams.pageNum"
+      :page.sync="queryParams.pageIndex"
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
 
-    <!-- 添加或修改角色配置对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <!-- 添加或修改参数配置对话框 -->
+    <el-dialog :title="title" :visible.sync="open" width="400px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="角色名称" prop="roleName">
-          <el-input v-model="form.roleName" placeholder="请输入角色名称" />
+        <el-form-item label="名称" prop="appellation">
+          <el-input v-model="form.appellation" placeholder="请输入名称" maxlength="18" />
+        </el-form-item>
+        <el-form-item label="用户名" prop="name">
+          <el-input v-model="form.name" placeholder="请输入用户名"/>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input
+            v-model="form.password"
+            :type="flags?'password':'text'"
+            auto-complete="off"
+            placeholder="请输入密码"
+          >
+            <svg-icon slot="suffix" :icon-class="!flags?'eye-open':'eye'" class="el-input__icon input-icon" @click="flags=!flags"></svg-icon>
+          </el-input>
+        </el-form-item>
+        <el-form-item label="角色" prop="roleIds">
+          <el-select v-model="form.roleIds" multiple placeholder="请选择角色类型" clearable size="small">
+            <el-option
+              v-for="dict in rolelist"
+              :key="dict.id"
+              :label="dict.roleName"
+              :value="dict.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="说明">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"></el-input>
+          <el-input v-model="form.explicate" type="textarea" placeholder="请输入说明"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -75,94 +117,231 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 用户导入对话框 -->
+    <el-dialog :title="upload.title" :visible.sync="upload.open" width="400px" append-to-body>
+      <el-upload
+        ref="upload"
+        :limit="1"
+        accept=".xlsx, .xls"
+        :headers="upload.headers"
+        :action="upload.url + '?updateSupport=' + upload.updateSupport"
+        :disabled="upload.isUploading"
+        :on-progress="handleFileUploadProgress"
+        :on-success="handleFileSuccess"
+        :auto-upload="false"
+        drag
+      >
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">
+          将文件拖到此处，或
+          <em>点击上传</em>
+        </div>
+        <div class="el-upload__tip" slot="tip">
+          <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的用户数据
+          <el-link type="info" style="font-size:12px" @click="importTemplate">下载模板</el-link>
+        </div>
+        <div class="el-upload__tip" style="color:red" slot="tip">提示：仅允许导入“xls”或“xlsx”格式文件！</div>
+      </el-upload>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitFileForm">确 定</el-button>
+        <el-button @click="upload.open = false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listRole,changeRoleOperation, delRole, addRole, updateRole} from "@/api/system/role";
+import { getUser} from "@/api/system/user";
+import { getToken } from "@/utils/auth";
+import { listRole } from '@/api/system/role'
+import { dataToFlatten, transfer } from '@/utils/treeConversion'
 
 export default {
-  name: "userinfo",
+  name: "User",
   data() {
     return {
       // 遮罩层
       loading: true,
       // 选中数组
       ids: [],
+      // 非单个禁用
+      single: true,
+      // 非多个禁用
+      multiple: true,
       // 显示搜索条件
       showSearch: true,
       // 总条数
       total: 0,
-      // 角色表格数据
-      roleList: [],
+      // 用户表格数据
+      userList: null,
       // 弹出层标题
       title: "",
+      // 部门树选项
+      deptOptions: undefined,
       // 是否显示弹出层
       open: false,
+      // 部门名称
+      deptName: undefined,
+      // 默认密码
+      initPassword: undefined,
+      // 日期范围
+      dateRange: [],
+      // 状态数据字典
+      statusOptions: [],
+      // 性别状态字典
+      sexOptions: [],
+      // 岗位选项
+      postOptions: [],
+      // 角色选项
+      roleOptions: [],
+      // 表单参数
+      form: { },
+      defaultProps: {
+        children: "children",
+        label: "label"
+      },
+      // 用户导入参数
+      upload: {
+        // 是否显示弹出层（用户导入）
+        open: false,
+        // 弹出层标题（用户导入）
+        title: "",
+        // 是否禁用上传
+        isUploading: false,
+        // 是否更新已经存在的用户数据
+        updateSupport: 0,
+        // 设置上传的请求头部
+        headers: { Authorization: "Bearer " + getToken() },
+        // 上传的地址
+        url: process.env.VUE_APP_BASE_API + "/system/user/importData"
+      },
       // 查询参数
       queryParams: {
-        pageNum: 1,
+        pageIndex: 1,
         pageSize: 10,
-        roleName: undefined,
-        roleKey: undefined,
-        status: undefined
+        appellation: '',
+        name: '',
+        roleId: '',
       },
-      // 表单参数
-      form: {},
+      rolelist:[],
       // 表单校验
       rules: {
-        roleName: [
-          { required: true, message: "角色名称不能为空", trigger: "blur" }
+        appellation: [
+          { required: true, message: "名称不能为空", trigger: "blur" }
         ],
-        roleKey: [
-          { required: true, message: "权限字符不能为空", trigger: "blur" }
+        name: [
+          { required: true, message: "用户名不能为空", trigger: "blur" }
         ],
-        roleSort: [
-          { required: true, message: "角色顺序不能为空", trigger: "blur" }
-        ]
+        password: [
+          { required: true, message: "密码不能为空", trigger: "blur" }
+        ],
+        roleIds: [
+          { required: true, message: "角色不能为空", trigger: "blur" }
+        ],
       },
+      flags:false,
     };
   },
+  watch: {
+    // 根据名称筛选部门树
+    deptName(val) {
+      this.$refs.tree.filter(val);
+    }
+  },
   created() {
-    this.getList();
+    this.getList()
+    this.getrolelist()
   },
   methods: {
-    /** 查询角色列表 */
+    changeName(){
+
+    },
+    /** 查询用户列表 */
     getList() {
       this.loading = true;
-      listRole('').then(
-        response => {
-          this.roleList = response.data;
-          // this.total = response.total;
+      let roleId = 0,pageIndex=1,pageSize=10
+      if(this.queryParams.roleId){
+        roleId = this.queryParams.roleId
+      }
+      if(this.queryParams.pageIndex){
+        pageIndex = this.queryParams.pageIndex
+      }
+      if(this.queryParams.pageSize){
+        pageSize = this.queryParams.pageSize
+      }
+      let data = {
+        "appellation": this.queryParams.appellation,
+        "name": this.queryParams.name,
+        "pageIndex": pageIndex,
+        "pageSize": pageSize,
+        "roleId": roleId,
+      }
+      getUser(data,'change').then(response => {
+          this.userList = response.data.dataList;
+          this.total = response.data.count;
           this.loading = false;
         }
       );
     },
+    getrolelist(){
+      listRole('').then(
+        response => {
+          this.rolelist = response.data;
+        }
+      );
+    },
+
+    // 筛选节点
+    filterNode(value, data) {
+      if (!value) return true;
+      return data.label.indexOf(value) !== -1;
+    },
+    // 节点单击事件
+    handleNodeClick(data) {
+      this.queryParams.userId = data.id;
+      this.getList();
+    },
+    // 用户状态修改
+    handleStatusChange(row) {
+      let text = row.status === "0" ? "启用" : "停用";
+      this.$confirm('确认要"' + text + '""' + row.userName + '"用户吗?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+        return changeUserStatus(row.userId, row.status);
+      }).then(() => {
+        this.msgSuccess(text + "成功");
+      }).catch(function() {
+        row.status = row.status === "0" ? "1" : "0";
+      });
+    },
     // 取消按钮
     cancel() {
       this.open = false;
-      this.open1 = false;
       this.reset();
     },
     // 表单重置
     reset() {
-      if (this.$refs.menu != undefined) {
-        this.$refs.menu.setCheckedKeys([]);
-      }
       this.form = {
-        roleId: undefined,
-        roleName: undefined,
-        menuIds: [],
-        deptIds: [],
-        menuCheckStrictly: true,
-        deptCheckStrictly: true,
-        remark: undefined,
+        appellation: "",
+        explicate: "",
+        gender: 1,
+        id: 0,
+        isAgent: 1,
+        isStaff: 0,
+        managerRole: "",
+        name: "",
+        password: "",
+        phone: "",
+        roleIds: ""
       };
       this.resetForm("form");
     },
     /** 搜索按钮操作 */
     handleQuery() {
-      this.queryParams.pageNum = 1;
+      this.queryParams.pageIndex = 1;
       this.getList();
     },
     /** 重置按钮操作 */
@@ -171,92 +350,136 @@ export default {
       this.resetForm("queryForm");
       this.handleQuery();
     },
+    // 多选框选中数据
+    handleSelectionChange(selection) {
+      this.ids = selection.map(item => item.userId);
+      this.single = selection.length != 1;
+      this.multiple = !selection.length;
+    },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加角色";
-      this.menuLoad()
+      this.title = "添加用户";
+      /*getUser().then(response => {
+        this.postOptions = response.posts;
+        this.roleOptions = response.roles;
+        this.open = true;
+        this.title = "添加用户";
+        this.form.password = this.initPassword;
+      });*/
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       this.open = true;
-      this.title = "修改角色";
-      this.form = {
-        roleId: row.id,
-        roleName: row.roleName,
-        menuIds: [],
-        deptIds: [],
-        menuCheckStrictly: true,
-        deptCheckStrictly: true,
-        remark: row.explain
-      };
+      this.title = "修改用户";
+      /*const userId = row.userId || this.ids;
+      getUser(userId).then(response => {
+        this.form = response.data;
+        this.postOptions = response.posts;
+        this.roleOptions = response.roles;
+        this.form.postIds = response.postIds;
+        this.form.roleIds = response.roleIds;
+        this.open = true;
+        this.title = "修改用户";
+        this.form.password = "";
+      });*/
+    },
+    /** 重置密码按钮操作 */
+    handleResetPwd(row) {
+      this.$prompt('请输入"' + row.userName + '"的新密码', "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      }).then(({ value }) => {
+        resetUserPwd(row.userId, value).then(response => {
+          this.msgSuccess("修改成功，新密码是：" + value);
+        });
+      }).catch(() => {});
     },
     /** 提交按钮 */
     submitForm: function() {
       this.$refs["form"].validate(valid => {
+        let pattern = /^[a-zA-Z0-9]{6,18}$/ // 正整数的正则表达式
+        if (!pattern.test(this.from.name)) {
+          // input 框绑定的内容为空
+          this.msgError('用户名请输入长度6-18位的英文或数字')
+        }
+        if (!pattern.test(this.from.password)) {
+          // input 框绑定的内容为空
+          this.msgError('密码请输入长度6-18位的英文或数字')
+        }
         if (valid) {
-          if (this.form.roleId != undefined) {
-            let data = {
-              "roleName": this.form.roleName,
-              "roleId": this.form.roleId,
-              "explain": this.form.remark
-            }
-            updateRole(data).then(response => {
+          if (this.form.userId != undefined) {
+            updateUser(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
-            });
-            let data1 = {
-              "operations": this.getMenuAllCheckedKeys(),
-              "roleId": this.form.roleId
-            }
-            data1 = JSON.stringify(data1)
-            changeRoleOperation(data1,'change').then(response => {
-              this.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-              this.getmenu()
             });
           } else {
-            let data = {
-              roleName: this.form.roleName,
-              explain: this.form.remark
-            }
-            addRole(data).then(response => {
+            addUser(this.form).then(response => {
               this.msgSuccess("新增成功");
-              let data1 = {
-                "operations": this.getMenuAllCheckedKeys(),
-                "roleId": response.data.roleId
-              }
-              data1 = JSON.stringify(data1)
-              changeRoleOperation(data1,'change').then(response => {
-                this.msgSuccess("新增成功");
-                this.open = false;
-                this.getList();
-                this.getmenu()
-              });
+              this.open = false;
+              this.getList();
             });
-
           }
         }
       });
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      this.$confirm('是否确认删除角色"' + row.roleName + '"的数据项?', "警告", {
+      const userIds = row.userId || this.ids;
+      this.$confirm('是否确认删除用户编号为"' + userIds + '"的数据项?', "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       }).then(function() {
-        return delRole(row.id);
+        return delUser(userIds);
       }).then(() => {
         this.getList();
         this.msgSuccess("删除成功");
       })
     },
-
+    /** 导出按钮操作 */
+    handleExport() {
+      const queryParams = this.queryParams;
+      this.$confirm('是否确认导出所有用户数据项?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+        return exportUser(queryParams);
+      }).then(response => {
+        this.download(response.msg);
+      })
+    },
+    /** 导入按钮操作 */
+    handleImport() {
+      this.upload.title = "用户导入";
+      this.upload.open = true;
+    },
+    /** 下载模板操作 */
+    importTemplate() {
+      importTemplate().then(response => {
+        this.download(response.msg);
+      });
+    },
+    // 文件上传中处理
+    handleFileUploadProgress(event, file, fileList) {
+      this.upload.isUploading = true;
+    },
+    // 文件上传成功处理
+    handleFileSuccess(response, file, fileList) {
+      this.upload.open = false;
+      this.upload.isUploading = false;
+      this.$refs.upload.clearFiles();
+      this.$alert(response.msg, "导入结果", { dangerouslyUseHTMLString: true });
+      this.getList();
+    },
+    // 提交上传文件
+    submitFileForm() {
+      this.$refs.upload.submit();
+    }
   }
 };
 </script>

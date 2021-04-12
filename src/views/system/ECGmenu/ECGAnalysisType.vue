@@ -36,16 +36,22 @@
     </el-form>
     <el-row>
       <el-col :span="1.5">
-        <el-button type="primary" icon="el-icon-plus" size="mini" @click="handleAdd">新增</el-button>
+        <el-button
+          type="primary"
+          plain
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleAdd"
+        >新增</el-button>
       </el-col>
     </el-row>
     <el-table v-loading="loading" :data="List">
-      <el-table-column label="心电分析卡类型" prop="serviceTypeName" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="创建时间" prop="createdAt" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="心电分析卡次数" prop="aiTimes" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="说明" prop="description" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="操作人" prop="staffName" :show-overflow-tooltip="true" width="150" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="心电分析卡类型" prop="serviceTypeName"/>
+      <el-table-column label="创建时间" prop="createdAt" />
+      <el-table-column label="心电分析卡次数" prop="aiTimes" />
+      <el-table-column label="说明" prop="description" />
+      <el-table-column label="操作人" prop="staffName" />
+<!--      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -60,7 +66,7 @@
             @click="handleDelete(scope.row)"
           >删除</el-button>
         </template>
-      </el-table-column>
+      </el-table-column>-->
     </el-table>
 
     <pagination

@@ -59,13 +59,13 @@ export const constantRoutes = [
     hidden: true,
     children: [
       {
-        path: '/system/user/index',
+        path: '/list',
         component: (resolve) => require(['@/views/system/user'], resolve),
         name: 'User',
         meta: { title: '用户管理' }
       },
       {
-        path: '/system/user/list',
+        path: '/ECGAnalysislist',
         component: (resolve) => require(['@/views/system/user/ECGAnalysis'], resolve),
         name: 'ECGAnalysislist',
         meta: { title: '心电分析服务列表' }
@@ -73,18 +73,18 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/system',
+    path: '/ecg',
     component: Layout,
     hidden: true,
     children: [
       {
-        path: '/ecgmenu/type',
+        path: '/type',
         component: (resolve) => require(['@/views/system/ECGmenu/ECGAnalysisType'], resolve),
         name: 'ecgtype',
         meta: { title: '心电分析卡类型' }
       },
       {
-        path: '/ecgmenu/card',
+        path: '/card',
         component: (resolve) => require(['@/views/system/ECGmenu/ECGAnalysisCard'], resolve),
         name: 'ecgcard',
         meta: { title: '心电分析卡' }
@@ -92,28 +92,16 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/system',
+    path: '/edition',
     component: Layout,
     hidden: true,
     children: [
       {
-        path: '/system/role/index',
-        component: (resolve) => require(['@/views/system/role'], resolve),
-        name: 'Role',
-        meta: { title: '角色管理' }
+        path: '/edition/index',
+        component: (resolve) => require(['@/views/system/edition/index'], resolve),
+        name: 'edition',
+        meta: { title: '版本管理' }
       },
-      {
-        path: '/system/menu',
-        component: (resolve) => require(['@/views/system/menu'], resolve),
-        name: 'Menu',
-        meta: { title: '菜单管理' }
-      },
-      {
-        path: '/system/userinfo/index',
-        component: (resolve) => require(['@/views/system/userinfo/index'], resolve),
-        name: 'userinfo',
-        meta: { title: '后台用户' }
-      }
     ]
   },
   {
@@ -122,7 +110,32 @@ export const constantRoutes = [
     hidden: true,
     children: [
       {
-        path: '/system/password/index',
+        path: '/role',
+        component: (resolve) => require(['@/views/system/role'], resolve),
+        name: 'Role',
+        meta: { title: '角色管理' }
+      },
+      {
+        path: '/menu',
+        component: (resolve) => require(['@/views/system/menu'], resolve),
+        name: 'Menu',
+        meta: { title: '菜单管理' }
+      },
+      {
+        path: '/userinfo',
+        component: (resolve) => require(['@/views/system/userinfo/index'], resolve),
+        name: 'userinfo',
+        meta: { title: '后台用户' }
+      }
+    ]
+  },
+  {
+    path: '/password',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/password',
         component: (resolve) => require(['@/views/system/password'], resolve),
         name: 'password',
         meta: { title: '修改密码' }
@@ -132,7 +145,7 @@ export const constantRoutes = [
 ]
 
 export default new Router({
-  mode: 'history', // 去掉url中的#
+  mode: 'hash', // 去掉url中的#
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })

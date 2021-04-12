@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
+<!--    <el-form :model="queryParams" ref="queryForm" v-show="showSearch" :inline="true">
       <el-form-item label="角色名称" prop="roleName">
         <el-input
           v-model="queryParams.roleName"
@@ -50,7 +50,7 @@
           >删除</el-button>
         </template>
       </el-table-column>
-    </el-table>
+    </el-table>-->
 
     <pagination
       v-show="total>0"
@@ -175,14 +175,14 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加角色";
+      this.title = "添加心电分析服务";
       this.menuLoad()
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       this.open = true;
-      this.title = "修改角色";
+      this.title = "修改心电分析服务";
       this.form = {
         roleId: row.id,
         roleName: row.roleName,

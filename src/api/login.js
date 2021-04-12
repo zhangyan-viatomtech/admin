@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 登录方法
 export function login(phone, password, code, uuid) {
   const data = {
-    phone,
+    loginStr:phone,
     password,
   }
   return request({
