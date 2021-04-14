@@ -88,7 +88,7 @@
         <el-form-item label="用户名" prop="name">
           <el-input v-model="form.name" placeholder="请输入用户名"/>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
+        <el-form-item label="密码" prop="password" v-if="title == '添加用户'">
           <el-input
             v-model="form.password"
             :type="flags?'password':'text'"
@@ -99,12 +99,12 @@
           </el-input>
         </el-form-item>
         <el-form-item label="角色" prop="roleIds">
-          <el-select v-model="form.roleIds" multiple placeholder="请选择角色类型" clearable size="small">
+          <el-select v-model="roleIdsNamearr" multiple @change="selectChang" placeholder="请选择角色类型" clearable size="small">
             <el-option
               v-for="dict in rolelist"
               :key="dict.id"
               :label="dict.roleName"
-              :value="dict.id"
+              :value="dict.roleName"
             />
           </el-select>
         </el-form-item>
@@ -115,6 +115,23 @@
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog title="删除后台用户" :visible.sync="deleteOpen" width="300px" append-to-body class="deleted">
+      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="名称:">
+          {{form.appellation}}
+        </el-form-item>
+        <el-form-item label="用户名:">
+          {{form.name}}
+        </el-form-item>
+        <el-form-item label="角色:">
+          {{roleIdsname}}
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitDelete">确 定</el-button>
+        <el-button @click="cancelDelete">取 消</el-button>
       </div>
     </el-dialog>
 
@@ -155,8 +172,14 @@
 import { getUser} from "@/api/system/user";
 import { getToken } from "@/utils/auth";
 import { listRole } from '@/api/system/role'
-import { dataToFlatten, transfer } from '@/utils/treeConversion'
-
+import {register,checkNameExist,updateManager,deleteManager} from "@/api/login"
+import Cookies from 'js-cookie'
+Array.prototype.remove = function(val) {
+  var index = this.indexOf(val);
+  if (index > -1) {
+    this.splice(index, 1);
+  }
+};
 export default {
   name: "User",
   data() {
@@ -241,6 +264,10 @@ export default {
         ],
       },
       flags:false,
+      deleteOpen:false,
+      roleIdsname:'',
+      managerId:'',
+      roleIdsNamearr:[]
     };
   },
   watch: {
@@ -254,8 +281,15 @@ export default {
     this.getrolelist()
   },
   methods: {
-    changeName(){
-
+    selectChang(data){
+      /*for(let i=0;i<this.rolelist.length;i++){
+        if(this.rolelist[i].roleName==data && this.form.roleIds.indexOf(this.rolelist[i].id) !=-1){
+          this.form.roleIds.push(this.rolelist[i].id)
+        }else{
+          this.form.roleIds.remove(this.rolelist[i].id)
+        }
+      }*/
+      // console.log(data)
     },
     /** 查询用户列表 */
     getList() {
@@ -322,13 +356,17 @@ export default {
       this.open = false;
       this.reset();
     },
+    cancelDelete(){
+      this.deleteOpen = false;
+      this.reset();
+    },
     // 表单重置
     reset() {
       this.form = {
         appellation: "",
         explicate: "",
         gender: 1,
-        id: 0,
+        id: '',
         isAgent: 1,
         isStaff: 0,
         managerRole: "",
@@ -371,9 +409,17 @@ export default {
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
+      console.log(row.roleIds)
       this.reset();
       this.open = true;
       this.title = "修改用户";
+      this.form.appellation = row.appellation;
+      this.form.explicate = row.explicate;
+      this.form.name = row.name;
+      this.form.password = row.password;
+      this.form.id = row.id;
+      this.form.roleIds = row.roleIds.split(',')
+      this.roleIdsNamearr = row.roles.split(',')
       /*const userId = row.userId || this.ids;
       getUser(userId).then(response => {
         this.form = response.data;
@@ -400,44 +446,82 @@ export default {
     /** 提交按钮 */
     submitForm: function() {
       this.$refs["form"].validate(valid => {
-        let pattern = /^[a-zA-Z0-9]{6,18}$/ // 正整数的正则表达式
-        if (!pattern.test(this.from.name)) {
-          // input 框绑定的内容为空
-          this.msgError('用户名请输入长度6-18位的英文或数字')
-        }
-        if (!pattern.test(this.from.password)) {
-          // input 框绑定的内容为空
-          this.msgError('密码请输入长度6-18位的英文或数字')
-        }
         if (valid) {
-          if (this.form.userId != undefined) {
-            updateUser(this.form).then(response => {
-              this.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-            });
+          let pattern = /^[a-zA-Z0-9]{6,18}$/ // 正整数的正则表达式
+          let name = this.form.name.toString()
+          if (!pattern.test(name)) {
+            this.msgError('用户名请输入长度6-18位的英文或数字')
+            return
+          }
+          if (this.form.id != '') {
+            let roleIds = []
+            for(let i=0;i<this.rolelist.length;i++){
+              console.log(this.roleIdsNamearr.indexOf(this.rolelist[i].roleName))
+              if(this.roleIdsNamearr.indexOf(this.rolelist[i].roleName) !=-1){
+                roleIds.push(this.rolelist[i].id)
+              }
+            }
+            let data = {
+              id:this.form.id,
+              appellation:  this.form.appellation,
+              explicate: this.form.explicate,
+              name: this.form.name,
+              password: this.form.password,
+              roleIds: roleIds.toString()
+            }
+            checkNameExist({name:this.form.name}).then(res=>{
+              if(res.code == 200){
+                updateManager(data,'change').then(response => {
+                  this.msgSuccess("修改成功");
+                  this.open = false;
+                  this.getList();
+                });
+              }else{
+                this.msgError(res.msg)
+              }
+            })
           } else {
-            addUser(this.form).then(response => {
-              this.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
-            });
+            let password = this.form.password
+            if (!pattern.test(password)) {
+              this.msgError('密码请输入长度6-18位的英文或数字')
+              return
+            }
+            let data = {
+              appellation:  this.form.appellation,
+              explicate: this.form.explicate,
+              name: this.form.name,
+              password: this.form.password,
+              roleIds: Cookies.get("RolesId")
+            }
+            checkNameExist({name:this.form.name}).then(res=>{
+              if(res.code == 200){
+                register(data,'change').then(response => {
+                  this.msgSuccess("新增成功");
+                  this.open = false;
+                  this.getList();
+                });
+              }else{
+                this.msgError(res.msg)
+              }
+            })
           }
         }
       });
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const userIds = row.userId || this.ids;
-      this.$confirm('是否确认删除用户编号为"' + userIds + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
-        return delUser(userIds);
-      }).then(() => {
-        this.getList();
+      console.log(row)
+      this.deleteOpen = true
+      this.form.appellation = row.appellation
+      this.form.name = row.name
+      this.managerId = row.id
+      this.roleIdsname = row.roles
+    },
+    submitDelete(){
+      deleteManager({managerId:this.managerId}).then(res=>{
+        this.deleteOpen = false
         this.msgSuccess("删除成功");
+        this.getList();
       })
     },
     /** 导出按钮操作 */
@@ -483,3 +567,12 @@ export default {
   }
 };
 </script>
+<style>
+.deleted .el-form-item{
+  margin-bottom: 0px;
+}
+.deleted .el-form-item__label{
+  text-align: left;
+  padding-left: 30px;
+}
+</style>

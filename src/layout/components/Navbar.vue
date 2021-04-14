@@ -5,7 +5,7 @@
     <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
 
     <div class="right-menu">
-      <template v-if="device!=='mobile'">
+<!--      <template v-if="device!=='mobile'">
         <search id="header-search" class="right-menu-item" />
 
         <el-tooltip content="源码地址" effect="dark" placement="bottom">
@@ -22,23 +22,24 @@
           <size-select id="size-select" class="right-menu-item hover-effect" />
         </el-tooltip>
 
-      </template>
+      </template>-->
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar" class="user-avatar">
+          <img src="../../assets/images/avatar.jpg" class="user-avatar">
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
-          <router-link to="/user/profile">
+<!--          <router-link to="/user/profile">
             <el-dropdown-item>个人中心</el-dropdown-item>
           </router-link>
           <el-dropdown-item @click.native="setting = true">
             <span>布局设置</span>
           </el-dropdown-item>
-          <el-dropdown-item divided @click.native="logout">
+          -->
+          <div style="padding: 5px 10px" @click="logout">
             <span>退出登录</span>
-          </el-dropdown-item>
+          </div>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -54,6 +55,7 @@ import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
 import RuoYiGit from '@/components/RuoYi/Git'
 import RuoYiDoc from '@/components/RuoYi/Doc'
+import {  removeToken } from '@/utils/auth'
 
 export default {
   components: {
@@ -99,9 +101,11 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$store.dispatch('LogOut').then(() => {
+        removeToken()
+        location.reload();
+        /*this.$store.dispatch('LogOut').then(() => {
           location.href = '/index';
-        })
+        })*/
       })
     }
   }

@@ -34,7 +34,20 @@ export const constantRoutes = [
     children: [
       {
         path: '/redirect/:path(.*)',
-        component: (resolve) => require(['@/views/system/user'], resolve)
+        component: (resolve) => require(['@/views/index'], resolve)
+      }
+    ]
+  },
+  {
+    path: '/',
+    component: Layout,
+    redirect: 'index',
+    children: [
+      {
+        path: 'index',
+        component: (resolve) => require(['@/views/index'], resolve),
+        name: '首页',
+        meta: { title: '首页', icon: 'dashboard', noCache: true, affix: true }
       }
     ]
   },

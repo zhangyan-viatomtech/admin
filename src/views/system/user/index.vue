@@ -22,7 +22,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="注册开始时间">
+      <el-form-item label="注册开始时间" class="time">
         <el-date-picker
           v-model="queryParams.beginTime"
           type="date"
@@ -31,7 +31,7 @@
           format="yyyy 年 MM 月 dd 日">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="注册结束时间">
+      <el-form-item label="注册结束时间" class="time">
         <el-date-picker
           v-model="queryParams.endTime"
           type="date"
@@ -569,3 +569,9 @@ export default {
   }
 };
 </script>
+
+<style>
+.time .el-form-item__label{
+  width: 100px!important;
+}
+</style>

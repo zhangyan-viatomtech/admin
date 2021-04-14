@@ -1,7 +1,7 @@
 <template>
   <div class="upload-file">
     <el-upload
-      :action="uploadFileUrl"
+      action="#"
       :before-upload="handleBeforeUpload"
       :file-list="fileList"
       :limit="1"

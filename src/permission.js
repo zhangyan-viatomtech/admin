@@ -15,7 +15,7 @@ router.beforeEach((to, from, next) => {
   if (getToken()) {
     /* has token*/
     if (to.path === '/login') {
-      next({ path: '/' })
+      next({ path: '/index' })
       NProgress.done()
     } else {
       if (store.state.user.roles.length==0) {
@@ -24,7 +24,11 @@ router.beforeEach((to, from, next) => {
           store.state.user.roles = Cookies.get('RolesId')
           // 根据roles权限生成可访问的路由表
           // router.addRoutes(accessRoutes) // 动态添加可访问路由表
-          next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
+          if(to.path == '/'){
+            next({ path: '/index' })
+          }else{
+            next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
+          }
         }).catch(err=>{
           console.log('err2',err)
         })

@@ -282,6 +282,12 @@ export default {
               this.getList();
             });
           } else {
+            let pattern = /^[+]{0,1}(\d+)$/ // 正整数的正则表达式
+            let generateNum = this.form.generateNum.toString()
+            if (!pattern.test(generateNum)) {
+              this.msgError('生成数量请输入正整数')
+              return
+            }
             let data = {
               cdKey: 1,
               ecgRemarkUse: this.form.ecgRemarkUse,

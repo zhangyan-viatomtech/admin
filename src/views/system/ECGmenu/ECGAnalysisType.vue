@@ -239,6 +239,12 @@ export default {
               this.getList();
             });
           } else {
+            let pattern = /^[+]{0,1}(\d+)$/ // 正整数的正则表达式
+            let aiTimes = this.form.aiTimes.toString()
+            if (!pattern.test(aiTimes)) {
+              this.msgError('心电分析卡次数请输入正整数')
+              return
+            }
             let data = {
               aiTimes: this.form.aiTimes,
               cdKeyType: 1,

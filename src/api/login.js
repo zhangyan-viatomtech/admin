@@ -40,12 +40,40 @@ export function checkPhoneExist(phone) {
 }
 
 //注册
-export function register(phone) {
+export function register(data,type) {
   return request({
     url: '/register',
-
     method: 'post',
-    params: {phone}
+    data,
+    type
+  })
+}
+
+//修改后台用户
+export function updateManager(data,type) {
+  return request({
+    url: '/healthManager/updateManager',
+    method: 'post',
+    data,
+    type
+  })
+}
+
+//删除后台用户
+export function deleteManager(data) {
+  return request({
+    url: '/healthManager/deleteManager',
+    method: 'get',
+    params:data,
+  })
+}
+
+//检测用户名是否已注册
+export function checkNameExist(data) {
+  return request({
+    url: '/checkNameExist',
+    method: 'get',
+    params:data,
   })
 }
 

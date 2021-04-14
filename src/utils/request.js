@@ -27,13 +27,15 @@ const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
   baseURL: baseURL,
   // 超时
-  timeout: 10000
+  timeout: 15000
 })
 // request拦截器
 service.interceptors.request.use(config => {
   if (config.type == 'change') {
     config.headers['Content-Type'] = 'application/json'
-  } else {
+  } else if (config.type == 'change2'){
+    config.headers['Content-Type'] = 'multipart/form-data'
+  }else {
     config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
   }
   // 是否需要设置 token
@@ -102,6 +104,7 @@ service.interceptors.response.use(res => {
     }
   },
   error => {
+    store.state.app.falg = true
     console.log('err' + error)
     let { message } = error;
     if (message == "Network Error") {
